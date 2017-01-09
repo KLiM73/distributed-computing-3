@@ -32,9 +32,12 @@ namespace lab3
 
                 Console.WriteLine("Сервер запущен. Ожидание подключений...");
                 int endl = 29;
+                Random rand = new Random();
+                Resizer Res = new Resizer(rand.Next(1, 500), rand.Next(1, 500));
+                Socket handler = listenSocket.Accept();
                 while (endl > 0)
                 {
-                    Socket handler = listenSocket.Accept();
+                    
                     // получаем сообщение
                     StringBuilder builder = new StringBuilder();
                     int bytes = 0; // количество полученных байтов
@@ -50,38 +53,31 @@ namespace lab3
                     inWidth.Add(mas[0]);
                     inHeight.Add(mas[1]);
                     Console.WriteLine(DateTime.Now.ToShortTimeString() + ":Сервер принимает: Ширина " + mas[0].ToString() + " Высота " + mas[1].ToString());
-                    inputPicture.width = Convert.ToInt32(mas[0]); inputPicture.height = Convert.ToInt32(mas[1]);
+                    inputPicture.width = Convert.ToInt32(mas[0]);
+                    inputPicture.height = Convert.ToInt32(mas[1]);
+
                     inputPictures.Add(inputPicture);
                     //ресайз
-                    Random rand = new Random();
-                    Resizer Res = new Resizer(rand.Next(1, 500), rand.Next(1, 500));
-                    resizedPictures = Res.resize(inputPictures);
+                    Picture resizedPicture = Res.resize(inputPicture);
                     // отправляем ответ
-                    int picturesCounter = 1;
-                    Console.WriteLine("\nОтправляем картинки:");
+                    Console.WriteLine("\nОтправляем картинку:");
                     string message;
-                    foreach (Picture i in resizedPictures)
-                    {
-                        message = i.width.ToString() + " " + i.height.ToString();
-                        data = Encoding.Unicode.GetBytes(Convert.ToString(message));
-                        handler.Send(data);
-                        Console.WriteLine("\nКартинка №" + picturesCounter + ", ширина:" + i.width + ", высота:" + i.height);
-                        picturesCounter++;
-                    }
-                    message = "новые картинки отправлены";
-                    data = Encoding.Unicode.GetBytes(message);
+                    message = resizedPicture.width.ToString() + " " + resizedPicture.height.ToString();
+                    data = Encoding.Unicode.GetBytes(Convert.ToString(message));
                     handler.Send(data);
-                    // закрываем сокет
-                    handler.Shutdown(SocketShutdown.Both);
-                    handler.Close();
+                    Console.WriteLine("\nширина:" + resizedPicture.width + ", высота:" + resizedPicture.height);
+                    Console.WriteLine("\nновая картинка отправлена");
                     endl--;
                 }
+                // закрываем сокет
+                handler.Shutdown(SocketShutdown.Both);
+                handler.Close();
                 Console.ReadKey();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-            }
+            } 
         }
     }
 }

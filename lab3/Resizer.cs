@@ -15,14 +15,11 @@ namespace lab3
             this.w = w;
             this.h = h;
         }
-        public List<Picture> resize(List<Picture> pictureList)
+        public Picture resize(Picture pic)
         {
-            foreach (Picture i in pictureList)
-            {
-                i.width = w;
-                i.height = h;
-            }
-            return pictureList;
+                pic.width = w;
+                pic.height = h;
+            return pic;
         }
     }
 }
